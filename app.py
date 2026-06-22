@@ -6,13 +6,12 @@ def download_any_video(video_url):
     if not video_url.strip():
         raise gr.Error("⚠️ أرجوك ضع رابط الفيديو أولاً يا زعيم!")
     
-    # إعدادات متطورة للتحميل من جميع المواقع بصيغة MP4 متوافقة مئة بالمئة
+    # الإعداد الذهبي: تحميل جودة شغال ومدمجة مباشرة لتخطي حماية يوتيوب على سيرفر Render
     ydl_opts = {
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',  # دمج الصوت والصورة بأعلى جودة MP4
-        'outtmpl': 'downloads/%(title)s.%(ext)s',  # حفظ الملف باسمه الأصلي داخل مجلد مؤقت
+        'format': 'best',  # اختيار أفضل جودة جاهزة للصوت والصورة معاً مباشرة
+        'outtmpl': 'downloads/%(title)s.%(ext)s',
         'quiet': True,
         'no_warnings': True,
-        'concurrent_fragment_downloads': 5,  # تسريع التحميل عبر سيرفر Render
     }
     
     try:
@@ -21,7 +20,6 @@ def download_any_video(video_url):
             info = ydl.extract_info(video_url, download=True)
             filename = ydl.prepare_filename(info)
             
-            # التأكد من صحة وجود الملف قبل إرساله للمستخدم
             if os.path.exists(filename):
                 return filename, "✅ تم استخراج وتجهيز الفيديو بنجاح عبر نظام 2Download! حمل الآن 👇"
             else:
@@ -31,7 +29,6 @@ def download_any_video(video_url):
         print(f"[2Download Error Log] {e}")
         raise gr.Error("❌ عذراً يا زعيم، الرابط غير مدعوم، أو الموقع يفرض حماية قوية ضد التنزيل!")
 
-# بناء واجهة استوديو التحميل العالمي 2Download
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown(
         """
@@ -58,6 +55,5 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
 
 if __name__ == "__main__":
     demo.queue()
-    # التوافق التلقائي مع بورت سيرفر Render مجاناً
     server_port = int(os.environ.get("PORT", 8080))
     demo.launch(server_name="0.0.0.0", server_port=server_port)
